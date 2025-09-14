@@ -40,7 +40,7 @@ type Mode = 'host' | 'client' | null;
  */
 export class TVTBridge extends EventTarget {
   private mode: Mode;
-  private players: Record<string, Player> = {};
+  private players: Array<Player> = [];
   private playerID: string | null = null;
   private DEBUG: boolean;
   private initialized: boolean;
