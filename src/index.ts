@@ -16,17 +16,7 @@ export interface Player {
 interface InitializePayload {
   playerID: string;
   players: Array<Player>;
-}
-
-interface MessagePayload {
-  origin?: string;
-  message?: string;
-  action?: Record<string, any>;
-  playerID?: string;
-  score?: number;
-  state?: Record<string, any>;
-  targetID?: string;
-  readable?: string;
+  settings: Record<string, any>;
 }
 
 // Define the valid modes for the TVTBridge.
@@ -42,8 +32,9 @@ export class TVTBridge extends EventTarget {
   private mode: Mode;
   private players: Array<Player> = [];
   private playerID: string | null = null;
+  private settings: Record<string, any> = {};
   private DEBUG: boolean;
-  private initialized: boolean;
+  private initialized: boolean = false;
 
   /**
    * Constructs the TVTBridge instance.
@@ -123,6 +114,12 @@ export class TVTBridge extends EventTarget {
         this._debuglog(`[${this.mode}]: Received initialization message and initialized game data. Dispatching 'initializeGame' event.`);
         this.dispatchEvent(new CustomEvent('initializeGame', { detail: payload }));
         break;
+      case 'UPDATE_SETTINGS':
+        let newSettings = payload.settings || {};
+        this.settings = Object.assign({}, this.settings, newSettings);
+        this._debuglog(`[${this.mode}]: Received settings update. Dispatching 'settingsUpdated' event.`);
+        this.dispatchEvent(new CustomEvent('settingsUpdated', { detail: newSettings }));
+        break;
       case 'PAUSE':
         this._debuglog(`[${this.mode}]: Received pause message. Dispatching 'pauseRequested' event.`);
         this.dispatchEvent(new Event('pauseRequested'));
@@ -177,6 +174,7 @@ export class TVTBridge extends EventTarget {
    * @param {InitializePayload} payload The initial data sent from the parent window.
    */
   private _initializeGame(payload: InitializePayload): void {
+    this.settings = payload.settings;
     this.players = payload.players;
     this.playerID = payload.playerID;
     if (this.playerID === 'host') {
@@ -191,9 +189,9 @@ export class TVTBridge extends EventTarget {
    * Sends a message to the parent window.
    * @private
    * @param {string} type The type of message to send.
-   * @param {MessagePayload} [payload={}] The data payload for the message.
+   * @param {any} [payload={}] The data payload for the message.
    */
-  private _passDataToParent(type: string, payload: MessagePayload = {}): void {
+  private _passDataToParent(type: string, payload: any = {}): void {
     const message = { type, payload };
     // Use '*' for development. In production, use a specific origin.
     window.parent.postMessage(message, '*');
@@ -215,6 +213,14 @@ export class TVTBridge extends EventTarget {
    */
   public sendDirectMessage(targetId: string, message: string): void {
     this._passDataToParent('DIRECT_MESSAGE', { message, targetID: targetId });
+  }
+
+  /**
+   * Sends updated settings to the parent window.
+   * @param {Record<string, any>} settings The settings object to send.
+   */
+  public sendSettingsUpdate(settings: Record<string, any>): void {
+    this._passDataToParent('UPDATE_SETTINGS', { settings });
   }
 
   /**
@@ -255,6 +261,8 @@ export class TVTBridge extends EventTarget {
     }
     this._passDataToParent('PLAYER_STATE_UPDATE', { playerID, score, state });
   }
+
+
 
   /**
    * notifies the parent window that the game has ended.

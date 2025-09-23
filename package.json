@@ -1,0 +1,19 @@
+{
+  "name": "tvt-bridge",
+  "version": "1.0.0",
+  "description": "A simple communication bridge allowing self-hosted games to interact with the TV Team Up platform.",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "files": ["build/**/*"],
+  "devDependencies": {
+    "typescript": "^x.x.x"
+  },
+  "keywords": [],
+  "author": "Greg Schoppe <gschoppe@gmail.com> (https://gschoppe.com)",
+  "license": "MIT",
+  "type": "commonjs"
+}
