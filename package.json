@@ -1,14 +1,18 @@
 {
   "name": "@tvteamup/tvtbridge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple communication bridge allowing self-hosted games to interact with the TV Team Up platform.",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
-  "files": ["build/**/*"],
+  "files": [
+    "dist",
+    "src/**/*",
+    "!**/*.spec.ts"
+  ],
   "devDependencies": {
     "typescript": "^x.x.x"
   },
