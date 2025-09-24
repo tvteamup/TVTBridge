@@ -106,10 +106,10 @@ game as needed, but this message will also contain playerID and score.
 #### Example:
 ```js
 bridge.addEventListener('playerState', (e)=>{
-  const details = e.detail;
-  const playerID = details.playerID;
-  const playerScore = details.score;
-  const data = details.data;
+  const detail = e.detail;
+  const playerID = detail.playerID;
+  const playerScore = detail.score;
+  const data = detail.data;
   updatePlayerState(playerID, playerScore, data);
 });
 ```
@@ -124,8 +124,8 @@ origin's playerID.
 ```js
 bridge.addEventListener('playerAction', (e)=>{
   const detail = e.detail;
-  const playerID = details.origin;
-  const action = details.action;
+  const playerID = detail.origin;
+  const action = detail.action;
   processPlayerAction(playerID, action);
 });
 ```
@@ -143,8 +143,8 @@ custom communications.
 ```js
 bridge.addEventListener('globalMessageReceived', (e)=>{
   const detail = e.detail;
-  const sender = details.origin;
-  const message = details.action;
+  const sender = detail.origin;
+  const message = detail.message;
   processGlobalMessage(sender, message);
 });
 ```
@@ -163,8 +163,8 @@ custom communications.
 ```js
 bridge.addEventListener('directMessageReceived', (e)=>{
   const detail = e.detail;
-  const sender = details.origin;
-  const message = details.action;
+  const sender = detail.origin;
+  const message = detail.message;
   processDirectMessage(sender, message);
 });
 ```
