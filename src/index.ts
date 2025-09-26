@@ -144,9 +144,13 @@ export class TVTBridge extends EventTarget {
         this._debuglog(`[${this.mode}]: Received direct message. Dispatching 'directMessageReceived' event.`);
         this.dispatchEvent(new CustomEvent('directMessageReceived', { detail: { origin: payload.origin, message: payload.message } }));
         break;
+      case 'PLAYER_ACTION_REQUESTED':
+        this._debuglog(`[${this.mode}]: Received player action request. Dispatching 'playerActionRequested' event.`);
+        this.dispatchEvent(new CustomEvent('playerActionRequested', { detail: { players: payload.players, prompt: payload.prompt, context: payload.context } }));
+        break;
       case 'PLAYER_ACTION':
         this._debuglog(`[${this.mode}]: Received player action update. Dispatching 'playerAction' event.`);
-        this.dispatchEvent(new CustomEvent('playerAction', { detail: { origin: payload.origin, action: payload.action } }));
+        this.dispatchEvent(new CustomEvent('playerAction', { detail: { origin: payload.origin, action: payload.action, context: payload.context } }));
         break;
       case 'GAME_STATE':
         this._debuglog(`[${this.mode}]: Received game state update. Dispatching 'gameState' event.`);
@@ -224,18 +228,6 @@ export class TVTBridge extends EventTarget {
   }
 
   /**
-   * [CLIENT MODE ONLY] Sends a player action to the parent window, associated with the current playerID.
-   * @param {Record<string, any>} playerAction The action performed by the player (e.g., selected answer).
-   */
-  public sendPlayerAction(playerAction: Record<string, any>): void {
-    if (this.mode !== 'client') {
-      this._debuglog('Cannot send player action in host mode.', 'warn');
-      return;
-    }
-    this._passDataToParent('PLAYER_ACTION', playerAction);
-  }
-
-  /**
    * [HOST MODE ONLY] Sends a game state update to the parent window.
    * @param {string} readable A human readable state summary, such as "Round 1/14".
    * @param {Record<string, any>} state The complete current state of the game.
@@ -262,7 +254,30 @@ export class TVTBridge extends EventTarget {
     this._passDataToParent('PLAYER_STATE_UPDATE', { playerID, score, state });
   }
 
-
+  /**
+   * [HOST MODE ONLY] Requests an action from one or more players.
+   * @param {string[] | string | null} players The player(s) to request an action from, or null for all players.
+   * @param {string} [context] Optional context for the action request.
+   */
+  public requestPlayerAction(players: string[] | string | null, prompt?: Record<string, any>, context?: string): void {
+    if (this.mode !== 'host') {
+      this._debuglog('Cannot request player action in client mode.', 'warn');
+      return;
+    }
+    this._passDataToParent('REQUEST_PLAYER_ACTION', { players, prompt, context });
+  }
+  
+  /**
+   * [CLIENT MODE ONLY] Sends a player action to the parent window, associated with the current playerID.
+   * @param {Record<string, any>} playerAction The action performed by the player (e.g., selected answer).
+   */
+  public sendPlayerAction(playerAction: Record<string, any>, context?: string): void {
+    if (this.mode !== 'client') {
+      this._debuglog('Cannot send player action in host mode.', 'warn');
+      return;
+    }
+    this._passDataToParent('PLAYER_ACTION', { action: playerAction, context });
+  }
 
   /**
    * notifies the parent window that the game has ended.

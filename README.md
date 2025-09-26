@@ -6,8 +6,8 @@ TV Team Up games are designed to run within an iframe that is hosted by tvteamup
 ## Receiving messages from the TV Team Up platform
 The TVTBridge object will fire several events to notify your game of communications from the TV Team Up platform.
 
-### initializeGame
-Fires when the TV Team Up server has successfully shaken hands with the Bridge,
+### [ALL] initializeGame
+Fires when the TV Team Up platform has successfully shaken hands with the Bridge,
 and passes information about the initial state of the game to your application,
 including player info.
 
@@ -35,8 +35,8 @@ bridge.addEventListener('gameInitialized', (e)=>{
 });
 ```
 
-### endGame
-Fires when the game host requests that the game end.
+### [ALL] endGame
+Fires when the game platform requests that the game end.
 
 #### Example:
 ```js
@@ -45,8 +45,8 @@ bridge.addEventListener('endGame', (e)=>{
 });
 ```
 
-### pauseRequested
-Fires when the game host requests that the game be paused.
+### [ALL] pauseRequested
+Fires when the game platform requests that the game be paused.
 
 #### Example:
 ```js
@@ -55,8 +55,8 @@ bridge.addEventListener('pauseRequested', (e)=>{
 });
 ```
 
-### resumeRequested
-Fires when the game host requests that the game resume from a paused state.
+### [ALL] resumeRequested
+Fires when the game platform requests that the game resume from a paused state.
 
 #### Example:
 ```js
@@ -65,8 +65,8 @@ bridge.addEventListener('resumeRequested', (e)=>{
 });
 ```
 
-### muteRequested
-Fires when the game host requests that the game be muted.
+### [ALL] muteRequested
+Fires when the game platform requests that the game be muted.
 
 #### Example:
 ```js
@@ -75,8 +75,8 @@ bridge.addEventListener('muteRequested', (e)=>{
 });
 ```
 
-### unmuteRequested
-Fires when the game host requests that the game be muted.
+### [ALL] unmuteRequested
+Fires when the game platform requests that the game be muted.
 
 #### Example:
 ```js
@@ -85,8 +85,8 @@ bridge.addEventListener('unmuteRequested', (e)=>{
 });
 ```
 
-### gameState
-Fires when the game host forwards game state from the host to clients.
+### [CLIENT ONLY] gameState
+Fires when the game platform forwards game state from the host to clients.
 The game state itself is an arbitrary object that can be defined by your
 game as needed.
 
@@ -98,8 +98,8 @@ bridge.addEventListener('gameState', (e)=>{
 });
 ```
 
-### playerState
-Fires when the game host forwards a player's state from the host to clients.
+### [CLIENT ONLY] playerState
+Fires when the game platform forwards a player's state from the host to a client.
 The player state itself is an arbitrary object that can be defined by your
 game as needed, but this message will also contain playerID and score.
 
@@ -114,11 +114,17 @@ bridge.addEventListener('playerState', (e)=>{
 });
 ```
 
-### playerAction
-Fires when the game host forwards a player's action from the client to the host.
+### [CLIENT ONLY] playerActionRequested
+Fires when the game platform forwards a request for player action from the host to a
+client. The prompt is an arbitrary map of strings to values, used to clarify what
+action is being requested. 
+
+### [HOST ONLY] playerAction
+Fires when the game platform forwards a player's action from the client to the host.
 The player action itself is an arbitrary object that can be defined by your
 game as needed. Along with the action, the event detail will also include the
-origin's playerID.
+origin's playerID. Optionally, the event detail may also contain a context
+string, used to identify what prompt the player is responding to.
 
 #### Example:
 ```js
@@ -126,11 +132,12 @@ bridge.addEventListener('playerAction', (e)=>{
   const detail = e.detail;
   const playerID = detail.origin;
   const action = detail.action;
-  processPlayerAction(playerID, action);
+  const context = detail.context;
+  processPlayerAction(playerID, action, context);
 });
 ```
 
-### globalMessageReceived
+### [ALL] globalMessageReceived
 Fires when the game host forwards a global message from any player or host to all
 other clients. the event details will contain the origin (playerID or `HOST`) of
 the message, as well as the message itself, which is expected to be a string.
@@ -149,7 +156,7 @@ bridge.addEventListener('globalMessageReceived', (e)=>{
 });
 ```
 
-### directMessageReceived
+### [ALL] directMessageReceived
 Fires when the game host forwards a direct message from a specific player or host
 to another specific client. the event details will contain the origin
 (playerID or 'host') of the message, as well as the message itself, which is
@@ -172,7 +179,7 @@ bridge.addEventListener('directMessageReceived', (e)=>{
 ## Sending Messages
 The TVTBridge object contains several methods designed to send messages from the client players and host to the game platform.
 
-### sendGlobalMessage(message)
+### [ALL] sendGlobalMessage(message)
 Passes an arbitrary string to the game platform, to be distributed to all clients.
 
 #### Example:
@@ -180,7 +187,7 @@ Passes an arbitrary string to the game platform, to be distributed to all client
 bridge.sendGlobalMessage('Hello World!');
 ```
 
-### sendDirectMessage(message, target)
+### [ALL] sendDirectMessage(message, target)
 Passes an arbitrary string to the game platform, to be distributed to a specific client, identified by either player ID or the identifier `HOST`.
 
 #### Example:

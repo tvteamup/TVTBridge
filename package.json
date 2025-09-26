@@ -1,6 +1,6 @@
 {
   "name": "@tvteamup/tvtbridge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple communication bridge allowing self-hosted games to interact with the TV Team Up platform.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
