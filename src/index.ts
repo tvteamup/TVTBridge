@@ -144,6 +144,16 @@ export class TVTBridge extends EventTarget {
         this._debuglog(`[${this.mode}]: Received direct message. Dispatching 'directMessageReceived' event.`);
         this.dispatchEvent(new CustomEvent('directMessageReceived', { detail: { origin: payload.origin, message: payload.message } }));
         break;
+      case 'PLAYER_JOINED':
+        this.players.push(payload.player);
+        this._debuglog(`[${this.mode}]: Player joined: ${payload.player.name} (ID: ${payload.player.id}). Dispatching 'playerJoined' event.`);
+        this.dispatchEvent(new CustomEvent('playerJoined', { detail: payload.player }));
+        break;
+      case 'PLAYER_LEFT':
+        this.players = this.players.filter(player => player.id !== payload.playerID);
+        this._debuglog(`[${this.mode}]: Player left: ID ${payload.playerID}. Dispatching 'playerLeft' event.`);
+        this.dispatchEvent(new CustomEvent('playerLeft', { detail: { playerID: payload.playerID } }));
+        break;
       case 'PLAYER_ACTION_REQUESTED':
         this._debuglog(`[${this.mode}]: Received player action request. Dispatching 'playerActionRequested' event.`);
         this.dispatchEvent(new CustomEvent('playerActionRequested', { detail: { players: payload.players, prompt: payload.prompt, context: payload.context } }));

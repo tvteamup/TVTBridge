@@ -17,8 +17,8 @@ const bridge = new TVTBridge();
 
 bridge.addEventListener('gameInitialized', (e)=>{
   const gameInfo = e.detail;
-  mode = gameInfo.mode; // either 'host' or 'client'
-  players = gameInfo.players;
+  const mode = gameInfo.mode; // either 'host' or 'client'
+  const players = gameInfo.players;
   /* players = [
     {
       id: '123456789012234567890',
@@ -29,8 +29,8 @@ bridge.addEventListener('gameInitialized', (e)=>{
     },
     ...
   ];*/
-  playerID = gameInfo.playerID; // "12345678901234567890"
-  gameState = initialState;
+  const playerID = gameInfo.playerID; // "12345678901234567890"
+  const gameState = initialState;
   startGame(mode);
 });
 ```
@@ -93,8 +93,34 @@ game as needed.
 #### Example:
 ```js
 bridge.addEventListener('gameState', (e)=>{
-  state = e.detail;
+  let state = e.detail;
   processGameState(state);
+});
+```
+
+### [ALL] playerJoined
+Fires when a new player joins the game. The player object, passed in
+the event details, contains attributes for `id`, `name`, `avatarHash`,
+`score`, and an arbitrary `data` store.
+
+#### Example:
+```js
+bridge.addEventListener('playerJoined', (e)=>{
+  const detail = e.detail;
+  const player = detail.player;
+  processAddPlayer(player);
+});
+```
+
+### [ALL] playerLeft
+Fires when a player leaves the game. Passes the `playerID` in the event details.
+
+#### Example:
+```js
+bridge.addEventListener('playerLeft', (e)=>{
+  const detail = e.detail;
+  const player = detail.playerID;
+  processRemovePlayer(playerID);
 });
 ```
 
@@ -117,7 +143,17 @@ bridge.addEventListener('playerState', (e)=>{
 ### [CLIENT ONLY] playerActionRequested
 Fires when the game platform forwards a request for player action from the host to a
 client. The prompt is an arbitrary map of strings to values, used to clarify what
-action is being requested. 
+action is being requested.
+
+#### Example:
+```js
+bridge.addEventListener('playerActionRequested', (e)=>{
+  const detail = e.detail;
+  const prompt = detail.prompt;
+  const context = detail.context;
+  processPlayerAction(playerID, prompt, context);
+});
+```
 
 ### [HOST ONLY] playerAction
 Fires when the game platform forwards a player's action from the client to the host.
